@@ -3,6 +3,7 @@ const { sequelize } = require('./model'); // Import the sequelize instance
 const { getProfile } = require('./middleware/getProfile'); // Import our getProfile middleware
 const profileRoutes = require('./routes/profileRoutes'); // Import the new profile routes
 const jobRoutes = require('./routes/jobRoutes'); 
+const balanceRoutes = require('./routes/balanceRoutes');
 const cors = require('cors'); // Import cors to handle cross-origin requests from React app
 
 const app = express();
@@ -23,6 +24,7 @@ app.set('models', sequelize.models)
 // The /profiles route does not need the getProfile middleware for listing all profiles
 app.use('/profiles', profileRoutes);
 app.use('/jobs', getProfile, jobRoutes);
+app.use('/balances', getProfile, balanceRoutes);
 
 // Other routes that require authentication will use getProfile middleware
 // We'll add these as we implement more APIs:
