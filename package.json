@@ -11,8 +11,11 @@
     "cors": "^2.8.5" 
   },
   "scripts": {
-    "start": "nodemon ./src/server.js",
-    "seed": "node ./scripts/seedDb.js"
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon src/server.js",
+    "client": "npm --prefix ./frontend run dev",
+    "seed": "node ./scripts/seedDb.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "concurrently": "4.1.0",

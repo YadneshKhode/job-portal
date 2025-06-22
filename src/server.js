@@ -1,13 +1,13 @@
-const app = require('./app'); // Import the Express app instance
-const { sequelize } = require('./model'); // Import the sequelize instance
+const app = require('./app');
+const { sequelize } = require('./model');
 
-const PORT = process.env.PORT || 3001; // Use environment variable for port or default to 3001
+const PORT = process.env.PORT || 3001;
 
 /**
  * @function start
  * @description Initializes the database connection and starts the Express server.
  */
-async function start() {
+(async function start() {
   try {
     // Test the database connection
     await sequelize.authenticate();
@@ -23,7 +23,4 @@ async function start() {
     // Exit the process with an error code if startup fails
     process.exit(1);
   }
-}
-
-// Call the start function to kick off the application
-start();
+})();

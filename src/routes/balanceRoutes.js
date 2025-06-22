@@ -1,8 +1,8 @@
-// src/routes/balanceRoutes.js
 const express = require('express');
 const router = express.Router();
-const { Job, Contract, Profile, sequelize } = require('../model'); // Import necessary models and sequelize
-const { Op } = require('sequelize'); // Import Op for operators
+const { Job, Contract, sequelize } = require('../model');
+const { Op } = require('sequelize');
+const { ContractStatus } = require('../enums');
 
 /**
  * @swagger
@@ -56,9 +56,9 @@ const { Op } = require('sequelize'); // Import Op for operators
  */
 router.post('/deposit/:userId', async (req, res) => {
   const { userId } = req.params;
-  let { amount } = req.body; // Use 'let' for amount as we'll parse it
+  let { amount } = req.body;
 
-  const clientProfile = req.profile; // The authenticated profile (should be the client depositing)
+  const clientProfile = req.profile;
 
   // --- Validation 1: Ensure authenticated user is the target user for deposit ---
   // Convert userId from params to a number for strict comparison
@@ -103,7 +103,7 @@ router.post('/deposit/:userId', async (req, res) => {
         attributes: [], // Don't need Contract attributes for this sum
         where: {
           ClientId: clientProfile.id, // Only contracts where this client is the Client
-          status: 'in_progress' // Only active contracts
+          status: ContractStatus.IN_PROGRESS,
         },
       },
       transaction: t, // Include in the transaction

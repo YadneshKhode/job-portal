@@ -1,8 +1,7 @@
-// src/routes/adminRoutes.js
 const express = require('express');
 const router = express.Router();
-const { Job, Contract, Profile, sequelize } = require('../model'); // Import models and sequelize
-const { Op } = require('sequelize'); // Import Op for date range operations
+const { Job, Contract, Profile, sequelize } = require('../model');
+const { Op } = require('sequelize');
 
 /**
  * @swagger

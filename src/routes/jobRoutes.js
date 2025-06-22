@@ -1,8 +1,8 @@
-// src/routes/jobRoutes.js
 const express = require('express');
 const router = express.Router();
 const { Job, Contract, Profile, sequelize } = require('../model');
-const { Op } = require('sequelize'); // Import Op for OR operator
+const { Op } = require('sequelize');
+const { ContractStatus } = require('../enums');
 
 /**
  * @swagger
@@ -27,8 +27,6 @@ const { Op } = require('sequelize'); // Import Op for OR operator
  * description: Internal server error.
  */
 router.get('/unpaid', async (req, res) => {
-  // The `req.profile` object is available here because `getProfile` middleware
-  // will be applied to these routes in `app.js`.
   const profile = req.profile;
 
   try {
@@ -46,7 +44,7 @@ router.get('/unpaid', async (req, res) => {
           // Only include contracts that are 'in_progress'
           // AND where the current profile is either the Client or the Contractor
           where: {
-            status: 'in_progress',
+            status: ContractStatus.IN_PROGRESS,
             [Op.or]: [ // Use Op.or for logical OR condition
               { ClientId: profile.id },
               { ContractorId: profile.id }
@@ -72,6 +70,46 @@ router.get('/unpaid', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+router.get('/paid-and-unpaid', async (req, res) => {
+  const profile = req.profile;
+
+  try {
+    const jobs = await Job.findAll({
+      include: [
+        {
+          model: Contract,
+          // Only include contracts that are 'in_progress'
+          // AND where the current profile is either the Client or the Contractor
+          where: {
+            status: ContractStatus.IN_PROGRESS,
+            [Op.or]: [ // Use Op.or for logical OR condition
+              { ClientId: profile.id },
+              { ContractorId: profile.id }
+            ]
+          },
+          // Optionally, include the client and contractor profiles within the contract
+          // This can be useful for frontend display, but make sure not to fetch sensitive data unnecessarily.
+          include: [
+            { model: Profile, as: 'Client' },
+            { model: Profile, as: 'Contractor' }
+          ]
+        }
+      ]
+    });
+
+    if (!jobs || jobs.length === 0) {
+      return res.status(404).json({ message: 'No jobs found for this profile on active contracts.' });
+    }
+
+    res.json(jobs);
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 /**
  * @swagger

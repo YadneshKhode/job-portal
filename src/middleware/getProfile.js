@@ -1,4 +1,4 @@
-const { Profile } = require('../model'); // Adjust path based on new structure
+const { Profile } = require('../model');
 
 async function getProfile(req, res, next) {
     const profileId = req.headers.profile_id || 0;
