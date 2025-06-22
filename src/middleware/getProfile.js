@@ -1,9 +1,22 @@
+const { Profile } = require('../model'); // Adjust path based on new structure
 
-const getProfile = async (req, res, next) => {
-    const {Profile} = req.app.get('models')
-    const profile = await Profile.findOne({where: {id: req.get('profile_id') || 0}})
-    if(!profile) return res.status(401).end()
-    req.profile = profile
-    next()
+async function getProfile(req, res, next) {
+    const profileId = req.headers.profile_id || 0;
+    if (!profileId) {
+        return res.status(401).json({ error: 'Unauthorized: No profile_id header provided' });
+    }
+
+    try {
+        const profile = await Profile.findOne({ where: { id: profileId } });
+        if (!profile) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid profile_id' });
+        }
+        req.profile = profile; 
+        next();
+    } catch (error) {
+        console.error('Error fetching profile in getProfile middleware:', error);
+        res.status(500).json({ error: 'Internal server error during authentication' });
+    }
 }
-module.exports = {getProfile}
+
+module.exports = { getProfile };
